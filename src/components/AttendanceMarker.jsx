@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/AttendanceMarker.css";
-import { format, parseISO, isAfter, isBefore, addHours, subHours, differenceInHours,differenceInMinutes } from "date-fns";
+import { format, parseISO, isAfter, isBefore, addHours, subHours, differenceInHours, differenceInMinutes } from "date-fns";
 import { useUser } from "./UserContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -10,6 +10,23 @@ const AttendanceMark = () => {
   const currentDate = new Date();
   const [serviceNumbers, setServiceNumbers] = useState([]);
   const { userId } = useUser();
+  
+  // Initialize all fields with default values (empty strings instead of null/undefined)
+  const createNewEntry = (date, lastEntry = null) => {
+    const formattedDate = format(date, "yyyy-MM-dd");
+    return {
+      location: lastEntry?.location || "",
+      arrivalDate: formattedDate,
+      arrivalTime: lastEntry?.arrivalTime || "",
+      departureDate: formattedDate,
+      departureTime: lastEntry?.departureTime || "",
+      shiftType: lastEntry?.shiftType || "",
+      duration: lastEntry?.duration || "0.00",
+      penalty: "",
+      remarks: "",
+    };
+  };
+
   const [entries, setEntries] = useState([createNewEntry(currentDate)]);
   const [sharedFields, setSharedFields] = useState({
     date: format(currentDate, "yyyy-MM-dd"),
@@ -31,15 +48,12 @@ const AttendanceMark = () => {
 
   function fetchServiceNumbers() {
     axios
-      .get(
-        `http://localhost:8080/api/security-staff/getSecurityStaff/${userId}`
-      )
+      .get(`http://localhost:8080/api/security-staff/getSecurityStaff/${userId}`)
       .then((response) => {
         const data = Array.isArray(response.data)
           ? response.data
           : [response.data];
         setServiceNumbers(data);
-        console.log(response.data)
       })
       .catch((error) => {
         console.error("Error fetching users:", error);
@@ -59,23 +73,7 @@ const AttendanceMark = () => {
       });
   }
 
-  function createNewEntry(date, lastEntry = null) {
-    const formattedDate = format(date, "yyyy-MM-dd");
-    return {
-      location: lastEntry?.location,
-      arrivalDate: formattedDate,
-      arrivalTime: lastEntry?.arrivalTime,
-      departureDate: formattedDate,
-      departureTime: lastEntry?.departureTime,
-      shiftType: lastEntry?.shiftType,
-      duration: lastEntry?.duration,
-      penalty: null,
-      remarks: null,
-    };
-  }
-
   const check24HourShift = (empId, newShiftStart, newShiftEnd) => {
-    // Check if employee has worked a 24-hour shift in the past 36 hours
     const relevantShifts = shiftHistory.filter(shift => {
       const shiftEnd = new Date(`${shift.departureDate}T${shift.departureTime}`);
       const hoursSinceLastShift = differenceInHours(newShiftStart, shiftEnd);
@@ -84,12 +82,10 @@ const AttendanceMark = () => {
     });
 
     if (relevantShifts.length > 0) {
-      // Employee has done a 24-hour shift recently
       const lastShiftEnd = new Date(`${relevantShifts[0].departureDate}T${relevantShifts[0].departureTime}`);
       const requiredRestEnd = addHours(lastShiftEnd, 12);
       
       if (isBefore(newShiftStart, requiredRestEnd)) {
-        // Trying to work before 12-hour rest period is over
         const availableStartTime = format(requiredRestEnd, "yyyy-MM-dd'T'HH:mm");
         return {
           valid: false,
@@ -97,7 +93,6 @@ const AttendanceMark = () => {
         };
       }
 
-      // Check if new shift exceeds 12 hours after rest period
       const newShiftDuration = differenceInHours(newShiftEnd, newShiftStart);
       if (newShiftDuration > 12) {
         return {
@@ -125,43 +120,40 @@ const AttendanceMark = () => {
   };
 
   const handleChange = (index, field, value) => {
-  const updatedEntries = [...entries];
-  updatedEntries[index][field] = value;
-
-  // Always calculate duration when time/date fields change
-  if (['arrivalDate', 'arrivalTime', 'departureDate', 'departureTime'].includes(field)) {
-    calculateDuration(updatedEntries, index);
-  }
-
-  setEntries(updatedEntries);
-};
-
-const calculateDuration = (entriesArray, index) => {
-  try {
-    const arrival = parseISO(
-      `${entriesArray[index].arrivalDate}T${entriesArray[index].arrivalTime || '00:00'}`
-    );
-    const departure = parseISO(
-      `${entriesArray[index].departureDate}T${entriesArray[index].departureTime || '00:00'}`
-    );
-
-    if (departure <= arrival) {
-      entriesArray[index].duration = "0.00";
-      return;
+    const updatedEntries = [...entries];
+    updatedEntries[index][field] = value || "";
+    
+    if (['arrivalDate', 'arrivalTime', 'departureDate', 'departureTime'].includes(field)) {
+      calculateDuration(updatedEntries, index);
     }
 
-    const totalHours = differenceInHours(departure, arrival);
-    const minutes = differenceInMinutes(departure, arrival) % 60;
-    
-    entriesArray[index].duration = `${totalHours}.${minutes.toString().padStart(2, "0")}`;
-    
-    console.log(`Duration calculated: ${entriesArray[index].duration} hours`);
-    
-  } catch (error) {
-    console.error("Error calculating duration:", error);
-    entriesArray[index].duration = "0.00";
-  }
-};
+    setEntries(updatedEntries);
+  };
+
+  const calculateDuration = (entriesArray, index) => {
+    try {
+      const arrival = parseISO(
+        `${entriesArray[index].arrivalDate}T${entriesArray[index].arrivalTime || '00:00'}`
+      );
+      const departure = parseISO(
+        `${entriesArray[index].departureDate}T${entriesArray[index].departureTime || '00:00'}`
+      );
+
+      if (departure <= arrival) {
+        entriesArray[index].duration = "0.00";
+        return;
+      }
+
+      const totalHours = differenceInHours(departure, arrival);
+      const minutes = differenceInMinutes(departure, arrival) % 60;
+      
+      entriesArray[index].duration = `${totalHours}.${minutes.toString().padStart(2, "0")}`;
+      
+    } catch (error) {
+      console.error("Error calculating duration:", error);
+      entriesArray[index].duration = "0.00";
+    }
+  };
 
   const addNewEntry = () => {
     setEntries([
@@ -180,12 +172,8 @@ const calculateDuration = (entriesArray, index) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const hasEmptyFields =
-      !sharedFields.sId ||
-      entries.some((entry) => !entry.arrivalDate || !entry.departureDate);
-
-    if (hasEmptyFields) {
-      toast.error("Please fill all required fields",{
+    if (!sharedFields.sId || !sharedFields.companyName) {
+      toast.error("Please fill all required fields", {
         position: "top-right",
         autoClose: 3000,
       });
@@ -193,12 +181,8 @@ const calculateDuration = (entriesArray, index) => {
     }
 
     const hasInvalidDates = entries.some((entry) => {
-      const arrival = new Date(
-        `${entry.arrivalDate}T${entry.arrivalTime || "00:00"}`
-      );
-      const departure = new Date(
-        `${entry.departureDate}T${entry.departureTime || "00:00"}`
-      );
+      const arrival = new Date(`${entry.arrivalDate}T${entry.arrivalTime || "00:00"}`);
+      const departure = new Date(`${entry.departureDate}T${entry.departureTime || "00:00"}`);
       return departure < arrival;
     });
 
@@ -210,7 +194,6 @@ const calculateDuration = (entriesArray, index) => {
       return;
     }
 
-    // Check 24-hour shift rules
     for (const entry of entries) {
       const newShiftStart = new Date(`${entry.arrivalDate}T${entry.arrivalTime || "00:00"}`);
       const newShiftEnd = new Date(`${entry.departureDate}T${entry.departureTime || "00:00"}`);
@@ -233,9 +216,9 @@ const calculateDuration = (entriesArray, index) => {
         supervisorNo: sharedFields.supervisorNo,
         companyId: sharedFields.companyName,
         arrivalDate: entry.arrivalDate,
-        arrivalTime: entry.arrivalTime ? `${entry.arrivalTime}:00` : null,
+        arrivalTime: entry.arrivalTime || null,
         departureDate: entry.departureDate,
-        departureTime: entry.departureTime ? `${entry.departureTime}:00` : null,
+        departureTime: entry.departureTime || null,
         shiftType: entry.shiftType,
         duration: entry.duration,
         penalty: entry.penalty || null,
@@ -249,7 +232,7 @@ const calculateDuration = (entriesArray, index) => {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      toast.success("Attendance submitted successfully!",{
+      toast.success("Attendance submitted successfully!", {
         position: "top-right",
         autoClose: 3000,
       });
@@ -262,25 +245,16 @@ const calculateDuration = (entriesArray, index) => {
       });
     } catch (error) {
       console.error("Submission error:", error);
-      toast.error("Failed to submit attendance",{
+      toast.error(`Error: ${error.response?.data?.message || error.message}`, {
         position: "top-right",
-        autoClose: 3000,
+        autoClose: 5000,
       });
-      console.log(
-        `Failed to submit: ${error.response?.data?.message || error.message}`
-      );
     }
   };
 
   const locations = ["Main Office", "Kurunegala branch"];
   const shiftTypes = ["6 hours", "12 hours", "24 hours", "36 hours"];
-  const penalties = [
-    "",
-    "Late Arrival",
-    "Early Departure",
-    "Absent",
-    "Overtime",
-  ];
+  const penalties = ["", "Late Arrival", "Early Departure", "Absent", "Overtime"];
 
   return (
     <div className="attendance-form-container">
@@ -289,7 +263,6 @@ const calculateDuration = (entriesArray, index) => {
       <p className="instructions">Fill in the attendance details below.</p>
 
       <form onSubmit={handleSubmit}>
-        {/* Shared fields section (only shown once) */}
         <div className="shared-fields-card">
           <div className="form-row">
             <div className="form-group">
@@ -297,9 +270,7 @@ const calculateDuration = (entriesArray, index) => {
               <input
                 type="date"
                 value={sharedFields.date}
-                onChange={(e) =>
-                  handleSharedFieldChange("date", e.target.value)
-                }
+                onChange={(e) => handleSharedFieldChange("date", e.target.value)}
                 required
               />
             </div>
@@ -316,7 +287,6 @@ const calculateDuration = (entriesArray, index) => {
           </div>
         </div>
 
-        {/* Employee-specific fields (iterable) */}
         {entries.map((entry, index) => (
           <div key={index} className="entry-card">
             <div className="entry-header">
@@ -363,9 +333,7 @@ const calculateDuration = (entriesArray, index) => {
                 <label>Location*</label>
                 <select
                   value={entry.location}
-                  onChange={(e) =>
-                    handleChange(index, "location", e.target.value)
-                  }
+                  onChange={(e) => handleChange(index, "location", e.target.value)}
                   required
                 >
                   {locations.map((loc) => (
@@ -381,9 +349,7 @@ const calculateDuration = (entriesArray, index) => {
                 <input
                   type="date"
                   value={entry.arrivalDate}
-                  onChange={(e) =>
-                    handleChange(index, "arrivalDate", e.target.value)
-                  }
+                  onChange={(e) => handleChange(index, "arrivalDate", e.target.value)}
                   required
                 />
               </div>
@@ -393,9 +359,7 @@ const calculateDuration = (entriesArray, index) => {
                 <input
                   type="time"
                   value={entry.arrivalTime}
-                  onChange={(e) =>
-                    handleChange(index, "arrivalTime", e.target.value)
-                  }
+                  onChange={(e) => handleChange(index, "arrivalTime", e.target.value)}
                 />
               </div>
 
@@ -404,9 +368,7 @@ const calculateDuration = (entriesArray, index) => {
                 <input
                   type="date"
                   value={entry.departureDate}
-                  onChange={(e) =>
-                    handleChange(index, "departureDate", e.target.value)
-                  }
+                  onChange={(e) => handleChange(index, "departureDate", e.target.value)}
                   required
                 />
               </div>
@@ -416,9 +378,7 @@ const calculateDuration = (entriesArray, index) => {
                 <input
                   type="time"
                   value={entry.departureTime}
-                  onChange={(e) =>
-                    handleChange(index, "departureTime", e.target.value)
-                  }
+                  onChange={(e) => handleChange(index, "departureTime", e.target.value)}
                 />
               </div>
 
@@ -426,9 +386,7 @@ const calculateDuration = (entriesArray, index) => {
                 <label>Shift Type</label>
                 <select
                   value={entry.shiftType}
-                  onChange={(e) =>
-                    handleChange(index, "shiftType", e.target.value)
-                  }
+                  onChange={(e) => handleChange(index, "shiftType", e.target.value)}
                 >
                   {shiftTypes.map((shift) => (
                     <option key={shift} value={shift}>
@@ -451,10 +409,8 @@ const calculateDuration = (entriesArray, index) => {
               <div className="form-group penalty-field">
                 <label>Penalty</label>
                 <select
-                  value={entry.penalty || ""}
-                  onChange={(e) =>
-                    handleChange(index, "penalty", e.target.value || null)
-                  }
+                  value={entry.penalty}
+                  onChange={(e) => handleChange(index, "penalty", e.target.value)}
                 >
                   {penalties.map((pen) => (
                     <option key={pen} value={pen}>
@@ -469,10 +425,8 @@ const calculateDuration = (entriesArray, index) => {
                 <input
                   type="text"
                   placeholder="Optional remarks"
-                  value={entry.remarks || ""}
-                  onChange={(e) =>
-                    handleChange(index, "remarks", e.target.value || null)
-                  }
+                  value={entry.remarks}
+                  onChange={(e) => handleChange(index, "remarks", e.target.value)}
                 />
               </div>
             </div>
