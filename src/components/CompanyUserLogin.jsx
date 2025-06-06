@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate,Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "./UserContext";
 import { ToastContainer, toast } from "react-toastify";
@@ -8,10 +8,10 @@ import { motion } from "framer-motion";
 import "../styles/Login.css";
 import logo from "../assets/logo.png";
 
-const SuperAdminLogin = () => {
+const CompanyUserLogin = () => {
   const { setUser } = useUser();
   const [credentials, setCredentials] = useState({
-    userId: "",
+    email: "",
     password: ""
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -26,27 +26,33 @@ const SuperAdminLogin = () => {
     e.preventDefault();
     setIsLoading(true);
     
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(credentials.email)) {
+      toast.error("Please enter a valid email address", {
+        position: "top-right",
+        className: "error-toast",
+        progressStyle: { background: "#ff4d4f" }
+      });
+      setIsLoading(false);
+      return;
+    }
+    
     try {
-      const { userId, password } = credentials;
-      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userId);
-      
-      const endpoint = isEmail 
-        ? "http://localhost:8080/api/companyUser/login" 
-        : "http://localhost:8080/api/internalUser/login";
-      
-      const response = await axios.post(endpoint, { userId, password });
+      const { email, password } = credentials;
+      const response = await axios.post(
+        "http://localhost:8080/api/companyUser/login", 
+        { userId: email, password }
+      );
 
       if (response.status === 200 && response.data === "login successful") {
-        let role = isEmail ? "CompanyUser" : 
-          (await axios.get(`http://localhost:8080/api/internalUser/getUser/${userId}`)).data.systemUser.userRole;
-        
-        toast.success(`Welcome ${role}`, {
+        toast.success("Welcome Company User", {
           position: "top-right",
           autoClose: 1500,
           hideProgressBar: true,
           onClose: () => {
-            setUser(userId, role);
-            navigate(`/admin/${role}`);
+            setUser(email, "CompanyUser");
+            navigate("/admin/CompanyUser");
           }
         });
       }
@@ -94,7 +100,7 @@ const SuperAdminLogin = () => {
           >
             <img src={logo} alt="SITMOBITEL" className="logo" />
           </motion.div>
-          <h2>Welcome !</h2>
+          <h2>Company User Login</h2>
           <p>Security staff attendance marking system</p>
         </div>
 
@@ -104,15 +110,16 @@ const SuperAdminLogin = () => {
             whileFocus={{ boxShadow: "0 0 0 2px rgba(62, 152, 255, 0.5)" }}
           >
             <input
-              type="text"
-              name="userId"
-              value={credentials.userId}
+              type="email"
+              name="email"
+              value={credentials.email}
               onChange={handleChange}
               required
-              autoComplete="off"
+              autoComplete="email"
+              placeholder=" "
             />
-            <label>User ID / Email</label>
-            <span className="input-icon">👤</span>
+            <label>Company Email</label>
+            <span className="input-icon">✉️</span>
           </motion.div>
 
           <motion.div 
@@ -126,6 +133,7 @@ const SuperAdminLogin = () => {
               onChange={handleChange}
               required
               autoComplete="current-password"
+              placeholder=" "
             />
             <label>Password</label>
             <span className="input-icon">🔒</span>
@@ -164,4 +172,4 @@ const SuperAdminLogin = () => {
   );
 };
 
-export default SuperAdminLogin;
+export default CompanyUserLogin;
