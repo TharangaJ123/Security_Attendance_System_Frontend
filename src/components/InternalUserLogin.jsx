@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../styles/InternalUserLogin.css";
+import "../styles/internalUserRegistration.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

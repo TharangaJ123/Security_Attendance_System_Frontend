@@ -75,8 +75,13 @@ const CompanyUser = () => {
     
     try {
       const payload = {
-        ...formData,
-        company: { id: formData.company }
+        name: formData.name,
+        designation: formData.designation,
+        contactNumber: formData.contactNumber,
+        companyId: formData.company,
+        address: formData.address,
+        email: formData.email,
+        password: formData.password
       };
 
       await axios.post("http://localhost:8080/api/companyUser/save", payload);

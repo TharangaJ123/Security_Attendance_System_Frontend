@@ -8,40 +8,37 @@ const SystemUsers = () => {
   const [role, setRole] = useState("");
   const [users, setUsers] = useState([]);
 
-  function sendData(e) {
+    function sendData(e) {
     e.preventDefault();
 
     const newSystemUser = {
+      empId: 0,
       userRole: role,
     };
 
-    console.log("Data to Send:", newSystemUser);
-
-    axios
-      .post("http://localhost:8080/api/systemUser/save", newSystemUser)
-      .then((res) => {
-        console.log("Data Sent", res.data);
-        toast.success("System user added successfully!", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-        fetchUsers();
-      })
-      .catch((error) => {
-        toast.error("System user save failed!", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-        console.error("Error sending data:", error);
-      });
+    fetch("http://localhost:8080/api/systemUser/save", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newSystemUser),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log("Success:", data);
+      toast.success("System user added successfully!");
+      fetchUsers();
+    })
+    .catch(error => {
+      toast.error("System user save failed!");
+      console.error("Error:", error);
+    });
   }
 
   function fetchUsers() {
-    axios
-      .get("http://localhost:8080/api/systemUser/getAll")
+    axios.get("http://localhost:8080/api/systemUser/getAll")
       .then((response) => {
-        console.log("Fetched Users:", response.data); // Debugging
-        
+        console.log("Fetched Users:", response.data);
         setUsers(response.data);
       })
       .catch((error) => {
@@ -56,7 +53,6 @@ const SystemUsers = () => {
   return (
     <div className="system-users-container">
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar newestOnTop closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
-      {/* System Users Table */}
       <table className="system-users-table">
         <thead>
           <tr>
@@ -74,7 +70,6 @@ const SystemUsers = () => {
         </tbody>
       </table>
 
-      {/* Add New User Section */}
       <div className="add-user-section">
         <form method="post" onSubmit={sendData}>
           <input
