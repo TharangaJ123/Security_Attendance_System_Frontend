@@ -191,14 +191,14 @@ const AttendanceRecords = () => {
 
     if (searchTerm) {
       filtered = filtered.filter(record => 
-        record.employeeName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        record.empId?.toLowerCase().includes(searchTerm.toLowerCase())
+        record.employeeName || 
+        record.empId
       );
     }
 
     if (serviceNumberFilter) {
       filtered = filtered.filter(record => 
-        record.empId?.toLowerCase().includes(serviceNumberFilter.toLowerCase())
+        record.empId
       );
     }
 
