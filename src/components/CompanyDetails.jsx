@@ -51,15 +51,22 @@ const CompanyDetails = () => {
     setIsLoading(true);
     
     try {
-      const response = await axios.post(
+      const response = await fetch(
         `https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/securityCompany/save`,
-        formData,  // Ensure this is a plain object like { companyName: "Test", ... }
         {
+          method: "POST",
           headers: {
-            "Content-Type": "application/json", // Force JSON
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify(formData), // Convert your formData to JSON string
         }
       );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseData = await response.json(); // Parse the JSON response
       
       toast.success("Company added successfully!", {
         position: "top-right",
