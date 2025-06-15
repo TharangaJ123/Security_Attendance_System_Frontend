@@ -49,20 +49,23 @@ const CompanyDetails = () => {
     if (!validateForm()) return;
     
     setIsLoading(true);
+
+    const newCompany = {
+      companyName: formData.companyName,
+      contactNumber: formData.contactNumber,
+      companyAddress: formData.companyAddress
+    };
     
     try {
-      const response = await fetch(
-      `https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/securityCompany/save`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      }
-    );
-
-    console.log("Response:", response);
+      const response = await axios.post(
+        `https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/securityCompany/save`,{
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(newCompany),
+        }
+        
+      );
       
       toast.success("Company added successfully!", {
         position: "top-right",
