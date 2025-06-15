@@ -14,7 +14,7 @@ const AssignPatrolLeaders = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/internalUser/getAll`);
+      const response = await axios.get(`https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/internalUser/getAll`);
       setUsers(response.data);
       setLoading(false);
     } catch (error) {

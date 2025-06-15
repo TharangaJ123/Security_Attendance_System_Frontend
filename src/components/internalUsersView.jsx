@@ -11,7 +11,7 @@ const UserTable = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/internalUser/getAll`);
+        const response = await fetch(`https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/internalUser/getAll`);
         if (!response.ok) {
           throw new Error("Failed to fetch users");
         }

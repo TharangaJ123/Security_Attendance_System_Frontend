@@ -23,8 +23,8 @@ const SecurityStaffForm = () => {
     const fetchData = async () => {
       try {
         const [supervisorsRes, companiesRes] = await Promise.all([
-          axios.get(`${process.env.REACT_APP_API_URL}/api/internalUser/getAll`),
-          axios.get(`${process.env.REACT_APP_API_URL}/api/securityCompany/all`)
+          axios.get(`https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/internalUser/getAll`),
+          axios.get(`https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/securityCompany/all`)
         ]);
         setSupervisors(supervisorsRes.data);
         setCompanies(companiesRes.data);
@@ -91,7 +91,7 @@ const SecurityStaffForm = () => {
     
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/security-staff/add`,
+        `v/api/security-staff/add`,
         formData
       );
       

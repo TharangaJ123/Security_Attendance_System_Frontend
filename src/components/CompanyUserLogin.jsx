@@ -41,7 +41,7 @@ const CompanyUserLogin = () => {
     try {
       const { email, password } = credentials;
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/companyUser/login`, 
+        `https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/companyUser/login`, 
         { userId: email, password }
       );
 

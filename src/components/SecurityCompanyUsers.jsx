@@ -22,7 +22,7 @@ const SecurityCompanyUsers = () => {
   );
 
   function fetchSecurityCompanyUsers(){
-    axios.get(`${process.env.REACT_APP_API_URL}/api/companyUser/getAll`).then((res)=>{
+    axios.get(`https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/companyUser/getAll`).then((res)=>{
         console.log("user fetched : ",res.data);
         setUsers(res.data);
     }).catch((err)=>{
