@@ -46,6 +46,14 @@ const RegisterInternalUser = () => {
         position: "top-right",
         autoClose: 3000,
       });
+
+      // Reset form fields after successful registration
+      setUserId("");
+      setName("");
+      setContact("");
+      setEmail("");
+      setPassword("");
+      setSystemUser("");
     } catch (error) {
       console.error("Error details:", {
         status: error.response?.status,
