@@ -41,7 +41,7 @@ const CompanyUserLogin = () => {
     try {
       const { email, password } = credentials;
       const response = await axios.post(
-        "http://localhost:8080/api/companyUser/login", 
+        `${process.env.REACT_APP_API_URL}/api/companyUser/login`, 
         { userId: email, password }
       );
 

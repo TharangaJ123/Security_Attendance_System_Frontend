@@ -14,7 +14,7 @@ const AssignPatrolLeaders = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:8080/api/internalUser/getAll");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/internalUser/getAll`);
       setUsers(response.data);
       setLoading(false);
     } catch (error) {
@@ -55,7 +55,7 @@ const AssignPatrolLeaders = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:8080/api/assignPatrolOfficer/save",
+        `${process.env.REACT_APP_API_URL}/api/assignPatrolOfficer/save`,
         payload,
         {
           headers: {

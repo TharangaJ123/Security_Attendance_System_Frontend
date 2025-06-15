@@ -21,7 +21,7 @@ const PatronLeaderAttendanceRecord = () => {
   const fetchAttendanceRecords = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:8080/api/attendance/getAll');
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/attendance/getAll`);
       setAttendanceRecords(response.data);
     } catch (error) {
       console.error('Error fetching attendance records:', error);

@@ -16,7 +16,7 @@ const SystemUsers = () => {
       userRole: role,
     };
 
-    fetch("http://localhost:8080/api/systemUser/save", {
+    fetch(`${process.env.REACT_APP_API_URL}/api/systemUser/save`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -36,7 +36,7 @@ const SystemUsers = () => {
   }
 
   function fetchUsers() {
-    axios.get("http://localhost:8080/api/systemUser/getAll")
+    axios.get(`${process.env.REACT_APP_API_URL}/api/systemUser/getAll`)
       .then((response) => {
         console.log("Fetched Users:", response.data);
         setUsers(response.data);

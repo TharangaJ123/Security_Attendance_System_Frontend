@@ -52,7 +52,7 @@ const CompanyDetails = () => {
     
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/securityCompany/save",
+        `${process.env.REACT_APP_API_URL}/api/securityCompany/save`,
         formData
       );
       

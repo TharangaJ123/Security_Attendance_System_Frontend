@@ -15,7 +15,7 @@ const CompanyTable = () => {
 
   function fetchCompanies() {
     axios
-      .get("http://localhost:8080/api/securityCompany/all")
+      .get(`${process.env.REACT_APP_API_URL}/api/securityCompany/all`)
       .then((response) => {
         console.log("Fetched Companies:", response.data); // Debugging
         setCompanies(response.data);

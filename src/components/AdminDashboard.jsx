@@ -52,7 +52,7 @@ const AdminDashboard = () => {
 
   const fetchUsersDetails = () => {
     axios
-      .get(`http://localhost:8080/api/internalUser/getUser/${userId}`)
+      .get(`${process.env.REACT_APP_API_URL}/api/internalUser/getUser/${userId}`)
       .then((response) => {
         setName(response.data.name);
         setEmail(response.data.email);

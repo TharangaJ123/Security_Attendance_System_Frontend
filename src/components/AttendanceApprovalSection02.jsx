@@ -23,7 +23,7 @@ const AttendanceApprovalSection02 = () => {
   const fetchAttendanceRecords = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:8080/api/attendance/getAll');
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/attendance/getAll`);
       setAttendanceRecords(response.data);
       
     } catch (error) {

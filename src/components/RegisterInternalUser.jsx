@@ -32,7 +32,7 @@ const RegisterInternalUser = () => {
       console.log("Sending data:", JSON.stringify(newInternalUser, null, 2));
   
       const response = await axios.post(
-        "http://localhost:8080/api/internalUser/save", 
+        `${process.env.REACT_APP_API_URL}/api/internalUser/save`, 
         newInternalUser,
         {
           headers: {
@@ -62,7 +62,7 @@ const RegisterInternalUser = () => {
 
   function fetchRoles() {
     axios
-      .get("http://localhost:8080/api/systemUser/getAll")
+      .get(`${process.env.REACT_APP_API_URL}/api/systemUser/getAll`)
       .then((response) => {
         console.log("Fetched Roles:", response.data);
         setRoles(response.data);

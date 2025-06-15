@@ -12,7 +12,7 @@ const ViewSecurityEmployee = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/security-staff/all");
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/security-staff/all`);
         setEmployees(response.data);
         setLoading(false);
       } catch (err) {

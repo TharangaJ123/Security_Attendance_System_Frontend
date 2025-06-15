@@ -18,9 +18,9 @@ const DefaultComponent = () => {
     const fetchCounts = async () => {
       try {
         const [internalUsers, securityCompanies, securityOfficers] = await Promise.all([
-          axios.get("http://localhost:8080/api/internalUser/getInternalUsersCount"),
-          axios.get("http://localhost:8080/api/securityCompany/getSecurityCompanyCount"),
-          axios.get("http://localhost:8080/api/security-staff/getSecurityOfficersCount")
+          axios.get(`${process.env.REACT_APP_API_URL}/api/internalUser/getInternalUsersCount`),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/securityCompany/getSecurityCompanyCount`),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/security-staff/getSecurityOfficersCount`)
         ]);
 
         setCounts({

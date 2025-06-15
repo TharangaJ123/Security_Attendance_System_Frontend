@@ -22,7 +22,7 @@ const SecurityCompanyUsers = () => {
   );
 
   function fetchSecurityCompanyUsers(){
-    axios.get("http://localhost:8080/api/companyUser/getAll").then((res)=>{
+    axios.get(`${process.env.REACT_APP_API_URL}/api/companyUser/getAll`).then((res)=>{
         console.log("user fetched : ",res.data);
         setUsers(res.data);
     }).catch((err)=>{

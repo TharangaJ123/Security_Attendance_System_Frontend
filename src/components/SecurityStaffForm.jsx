@@ -23,8 +23,8 @@ const SecurityStaffForm = () => {
     const fetchData = async () => {
       try {
         const [supervisorsRes, companiesRes] = await Promise.all([
-          axios.get("http://localhost:8080/api/internalUser/getAll"),
-          axios.get("http://localhost:8080/api/securityCompany/all")
+          axios.get(`${process.env.REACT_APP_API_URL}/api/internalUser/getAll`),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/securityCompany/all`)
         ]);
         setSupervisors(supervisorsRes.data);
         setCompanies(companiesRes.data);
@@ -91,7 +91,7 @@ const SecurityStaffForm = () => {
     
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/security-staff/add",
+        `${process.env.REACT_APP_API_URL}/api/security-staff/add`,
         formData
       );
       

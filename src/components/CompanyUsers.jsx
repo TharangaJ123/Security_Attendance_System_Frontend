@@ -22,7 +22,7 @@ const CompanyUser = () => {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/securityCompany/all");
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/securityCompany/all`);
         setCompanies(response.data);
       } catch (error) {
         toast.error("Failed to load companies", {
@@ -84,7 +84,7 @@ const CompanyUser = () => {
         password: formData.password
       };
 
-      await axios.post("http://localhost:8080/api/companyUser/save", payload);
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/companyUser/save`, payload);
       
       toast.success("Company user registered successfully!", {
         position: "top-right",
