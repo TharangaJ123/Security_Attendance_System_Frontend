@@ -53,7 +53,12 @@ const CompanyDetails = () => {
     try {
       const response = await axios.post(
         `https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/securityCompany/save`,
-        formData
+        formData,  // Ensure this is a plain object like { companyName: "Test", ... }
+        {
+          headers: {
+            "Content-Type": "application/json", // Force JSON
+          },
+        }
       );
       
       toast.success("Company added successfully!", {
