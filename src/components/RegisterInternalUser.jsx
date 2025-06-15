@@ -17,29 +17,39 @@ const RegisterInternalUser = () => {
     e.preventDefault();
     
     try {
+      // Ensure systemUser is properly formatted as a number
+      const systemUserEmpId = parseInt(systemUser);
+      if (isNaN(systemUserEmpId)) {
+        toast.error("Invalid system user selection", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        return;
+      }
+
       const newInternalUser = {
-        userId,
-        name,
-        contact,
-        email,
-        password,
-        systemUser: { 
-          empId: parseInt(systemUser),
-          userRole: roles.find(r => r.empId === parseInt(systemUser))?.userRole || ""
+        userId: userId.trim(),
+        name: name.trim(),
+        contact: contact.trim(),
+        email: email.trim(),
+        password: password.trim(),
+        systemUser: {
+          empId: systemUserEmpId,
+          userRole: roles.find(r => r.empId === systemUserEmpId)?.userRole || ""
         }
       };
   
       console.log("Sending data:", JSON.stringify(newInternalUser, null, 2));
   
-      const response = await axios.post(
-        `https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/internalUser/save`, 
-        newInternalUser,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
+      const response = await axios({
+        method: 'post',
+        url: 'https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/internalUser/save',
+        data: newInternalUser,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         }
-      );
+      });
       
       console.log("Success:", response.data);
       toast.success("Internal user registered successfully!", {
@@ -61,7 +71,7 @@ const RegisterInternalUser = () => {
         message: error.message,
       });
       console.log(`Error: ${error.response?.data?.message || error.message}`);
-      toast.error("Internal user registration failed!", {
+      toast.error(error.response?.data?.message || "Internal user registration failed!", {
         position: "top-right",
         autoClose: 3000,
       });

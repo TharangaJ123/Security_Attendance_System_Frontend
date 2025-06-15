@@ -74,17 +74,28 @@ const CompanyUser = () => {
     setIsLoading(true);
     
     try {
-      const payload = {
-        name: formData.name,
-        designation: formData.designation,
-        contactNumber: formData.contactNumber,
-        companyId: formData.company,
-        address: formData.address,
-        email: formData.email,
-        password: formData.password
+      // Sanitize and structure the data according to backend expectations
+      const sanitizedData = {
+        name: formData.name.trim(),
+        designation: formData.designation.trim(),
+        contactNumber: formData.contactNumber.trim(),
+        companyId: parseInt(formData.company), // Ensure companyId is a number
+        address: formData.address.trim(),
+        email: formData.email.trim(),
+        password: formData.password.trim()
       };
 
-      await axios.post(`https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/companyUser/save`, payload);
+      console.log("Sending data:", JSON.stringify(sanitizedData, null, 2));
+
+      const response = await axios({
+        method: 'post',
+        url: 'https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/companyUser/save',
+        data: sanitizedData,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
       
       toast.success("Company user registered successfully!", {
         position: "top-right",
@@ -103,7 +114,18 @@ const CompanyUser = () => {
       });
     } catch (error) {
       console.error("Error saving company user:", error);
-      toast.error("Failed to register company user", {
+      console.error("Error details:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+      
+      // Show more specific error message if available
+      const errorMessage = error.response?.data?.message || 
+                         error.response?.data?.error || 
+                         "Failed to register company user";
+      
+      toast.error(errorMessage, {
         position: "top-right",
         autoClose: 3000,
       });

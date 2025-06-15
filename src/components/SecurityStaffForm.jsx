@@ -90,10 +90,27 @@ const SecurityStaffForm = () => {
     setIsLoading(true);
     
     try {
-      const response = await axios.post(
-        `v/api/security-staff/add`,
-        formData
-      );
+      // Sanitize the data
+      const sanitizedData = {
+        name: formData.name.trim(),
+        empId: formData.empId.trim(),
+        contact: formData.contact.trim(),
+        address: formData.address.trim(),
+        supervisor: formData.supervisor,
+        companyName: formData.companyName
+      };
+
+      console.log("Sending data:", JSON.stringify(sanitizedData, null, 2));
+
+      const response = await axios({
+        method: 'post',
+        url: 'https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/security-staff/add',
+        data: sanitizedData,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
       
       toast.success("Security staff added successfully!", {
         position: "top-right",
@@ -102,10 +119,15 @@ const SecurityStaffForm = () => {
       handleClear();
     } catch (error) {
       console.error("Error saving data:", error);
+      console.error("Error details:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
       if (error.response?.data) {
         setValidationErrors(error.response.data);
       } else {
-        toast.error("Failed to add security staff", {
+        toast.error(error.response?.data?.message || "Failed to add security staff", {
           position: "top-right",
           autoClose: 3000,
         });

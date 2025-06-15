@@ -51,15 +51,24 @@ const CompanyDetails = () => {
     setIsLoading(true);
     
     try {
-      const response = await axios.post(
-        `https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/securityCompany/save`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
+      // Ensure all string fields are properly trimmed
+      const sanitizedData = {
+        companyName: formData.companyName.trim(),
+        contactNumber: formData.contactNumber.trim(),
+        companyAddress: formData.companyAddress.trim()
+      };
+
+      console.log("Sending data:", JSON.stringify(sanitizedData, null, 2));
+
+      const response = await axios({
+        method: 'post',
+        url: 'https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/securityCompany/save',
+        data: sanitizedData,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         }
-      );
+      });
       
       toast.success("Company added successfully!", {
         position: "top-right",
@@ -75,7 +84,12 @@ const CompanyDetails = () => {
       });
     } catch (error) {
       console.error("Error saving company:", error);
-      toast.error("Failed to add company", {
+      console.error("Error details:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+      toast.error(error.response?.data?.message || "Failed to add company", {
         position: "top-right",
         autoClose: 3000,
       });
