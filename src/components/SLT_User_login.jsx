@@ -37,7 +37,7 @@ const SLTLogin = () => {
       });
       
       // 4. Send token to backend
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/me`, {
+      const res = await axios.get(`https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/user/me`, {
         headers: {
           Authorization: `Bearer ${tokenResponse.idToken || tokenResponse.accessToken}`,
         },

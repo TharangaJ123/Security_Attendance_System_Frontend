@@ -18,9 +18,9 @@ const DefaultComponent = () => {
     const fetchCounts = async () => {
       try {
         const [internalUsers, securityCompanies, securityOfficers] = await Promise.all([
-          axios.get(`${process.env.REACT_APP_API_URL}/api/internalUser/getInternalUsersCount`),
-          axios.get(`${process.env.REACT_APP_API_URL}/api/securityCompany/getSecurityCompanyCount`),
-          axios.get(`${process.env.REACT_APP_API_URL}/api/security-staff/getSecurityOfficersCount`)
+          axios.get(`https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/internalUser/getInternalUsersCount`),
+          axios.get(`https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/securityCompany/getSecurityCompanyCount`),
+          axios.get(`https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/security-staff/getSecurityOfficersCount`)
         ]);
 
         setCounts({
