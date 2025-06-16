@@ -44,7 +44,7 @@ const RegisterInternalUser = () => {
       const response = await axios({
         method: 'post',
         url: 'https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/internalUser/save',
-        data: newInternalUser,
+        data: JSON.stringify(newInternalUser),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
