@@ -58,13 +58,13 @@ const CompanyDetails = () => {
     
     try {
       const response = await axios.post(
-        `https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/securityCompany/save`,{
+        `https://frdattendancemanagementsystemtestdiployment-production.up.railway.app/api/securityCompany/save`,
+        newCompany, // This is the data payload
+        {
           headers: {
             "Content-Type": "application/json"
-          },
-          body: JSON.stringify(newCompany),
+          }
         }
-        
       );
 
       console.log("Company saved successfully:", response.data);
