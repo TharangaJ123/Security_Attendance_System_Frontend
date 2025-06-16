@@ -66,6 +66,8 @@ const CompanyDetails = () => {
         }
         
       );
+
+      console.log("Company saved successfully:", response.data);
       
       toast.success("Company added successfully!", {
         position: "top-right",
