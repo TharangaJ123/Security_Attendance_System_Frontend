@@ -34,8 +34,7 @@ const RegisterInternalUser = () => {
         email: email.trim(),
         password: password.trim(),
         systemUser: {
-          empId: systemUserEmpId,
-          userRole: roles.find(r => r.empId === systemUserEmpId)?.userRole || ""
+          empId: systemUserEmpId
         }
       };
   
